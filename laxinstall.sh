@@ -46,14 +46,14 @@ sed -i "s|CHANGEME|$ETHURL|g" $WORKINGDIR/chainlink.env
 echo "${b} Starting Chainlink and Postgres containers${n}"
 more $WORKINGDIR/chainlink.env
 
-echo "Starting Postgres and Chainlink containers"
+echo "${b} Starting Postgres and Chainlink containers${n}"
 docker-compose build
 docker-compose up -d
 
-echo "Check running containers"
+echo "${b} Check running containers${n}"
 docker container ps -a
 
-echo "Your chainlink node should be available from this device at:"
+echo "${b}Your chainlink node should be available from this device at:${n}"
 echo "http://localhost:6688"
 
 echo "${b}Special thanks to https://github.com/thodges-gh.${n}"
