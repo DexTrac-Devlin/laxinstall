@@ -8,3 +8,5 @@
 `chmod +x laxinstall.sh`
 
 `sudo ./laxinstall.sh`
+
+*special thanks to https://github.com/thodges-gh*
