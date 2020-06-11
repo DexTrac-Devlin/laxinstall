@@ -1,5 +1,4 @@
 #!/bin/bash
-
 b=$(tput bold)
 n=$(tput sgr0)
 
@@ -34,20 +33,26 @@ echo "${b} Installing Docker-Compose${n}"
 sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
+
 git clone https://github.com/thodges-gh/min-cl-docker-compose.git
 cd min-cl-docker-compose
 chmod +x start.sh stop.sh
 
 read -p "${b} Enter Ethereum endpoint URL/APIkey:${n} " ETHURL
+
 WORKINGDIR=$(pwd)
 sed -i "s|CHANGEME|$ETHURL|g" $WORKINGDIR/chainlink.env
+
 rm -f $WORKINGDIR/secrets/apicredentials
+
 touch $WORKINGDIR/secrets/apicredentials
 
 read -p "${b} Enter e-mail address to be used for GUI access:${n} "  EMAIL
+
 echo $EMAIL >> $WORKINGDIR/secrets/apicredentials
 
 read -s -p "${b} Enter password to be used for GUI access:${n} " GUIPASS
+
 echo $GUIPASS >> $WORKINGDIR/secrets/apicredentials
 
 echo "${b} Starting Chainlink and Postgres containers${n}"
@@ -62,4 +67,5 @@ docker container ps -a
 
 echo "${b}Your chainlink node should be available from this device at:${n}"
 echo "http://localhost:6688"
+
 echo "${b}Special thanks to https://github.com/thodges-gh.${n}"
