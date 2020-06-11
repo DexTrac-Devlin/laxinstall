@@ -43,17 +43,13 @@ read -p "${b} Enter Ethereum endpoint URL/APIkey:${n} " ETHURL
 WORKINGDIR=$(pwd)
 sed -i "s|CHANGEME|$ETHURL|g" $WORKINGDIR/chainlink.env
 
-rm -f $WORKINGDIR/secrets/apicredentials
-
-touch $WORKINGDIR/secrets/apicredentials
-
 read -p "${b} Enter e-mail address to be used for GUI access:${n} "  EMAIL
 
-echo $EMAIL >> $WORKINGDIR/secrets/apicredentials
+sed -i "s|test@example.com|$EMAIL|g" $WORKINGDIR/secrets/apicredentials
 
 read -s -p "${b} Enter password to be used for GUI access:${n} " GUIPASS
 
-echo $GUIPASS >> $WORKINGDIR/secrets/apicredentials
+sed -i "s|password|$GUIPASS|g" $WORKINGDIR/secrets/apicredentials
 
 echo "${b} Starting Chainlink and Postgres containers${n}"
 more $WORKINGDIR/chainlink.env
