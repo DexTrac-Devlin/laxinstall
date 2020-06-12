@@ -62,8 +62,10 @@ apt=`command -v apt-get`
 yum=`command -v yum`
 
 if [ -n "$apt" ]; then
+    echo "apt detected"
     aptInstall
 elif [ -n "$yum" ]; then
+    echo "yum detected"
     yumInstall
 else
     echo "Err: apt or yum not detected.";
