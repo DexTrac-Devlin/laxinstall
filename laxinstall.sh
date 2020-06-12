@@ -44,7 +44,7 @@ echo " Installing dependencies"
 sudo yum remove docker* >>/dev/null 2>&1
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2 >>/dev/null 2>&1
 
-echo "CentOS suck, and you know it."
+echo "...all these friggin package managers..."
 sudo dnf install -y https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm
 
 echo " Adding Docker repo"
