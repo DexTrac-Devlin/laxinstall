@@ -31,8 +31,8 @@ usermod -aG docker $USERNAME >>/dev/null 2>&1
 
 echo "${b} Installing Docker-Compose${n}"
 sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose >>/dev/null 2>&1
-sudo chmod +x /usr/local/bin/docker-compose >>/dev/null 2>&1
-docker-compose --version >>/dev/null 2>&1
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
 
 git clone https://github.com/thodges-gh/min-cl-docker-compose.git
 cd min-cl-docker-compose
