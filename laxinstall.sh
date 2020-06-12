@@ -9,6 +9,7 @@ fi
 
 read -p "${b} Enter your non-root username:${n} " USERNAME
 
+aptInstall () {
 echo " Updating apt"
 apt-get -y update >>/dev/null 2>&1
 
@@ -33,6 +34,42 @@ echo " Installing Docker-Compose"
 sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose >>/dev/null 2>&1
 sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
+}
+
+yumInstall (){
+echo " Updating yum"
+yum check-update
+
+echo " Installing dependencies"
+yum remove docker* >>/dev/null 2>&1
+yum install -y yum-utils device-mapper-persistent-data lvm2 >>/dev/null 2>&1
+
+echo " Adding Docker repo"
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo >>/dev/null 2>&1
+
+echo " Updating yum after changes"
+yum check-update >>/dev/null 2>&1
+
+echo " Installing latest release of Docker-CE"
+yum install docker-ce docker-ce-cli containerd.io >>/dev/null 2>&1
+
+echo " Starting Docker-CE service"
+systemctl start docker >>/dev/null 2>&1
+}
+
+
+apt=`command -v apt-get`
+yum=`command -v yum`
+
+if [ -n "$apt" ]; then
+    aptInstall
+elif [ -n "$yum" ]; then
+    yumInstall
+else
+    echo "Err: apt or yum not detected.";
+    exit 1;
+fi
+
 
 echo " Cloning github.com/thodges-gh/min-cl-docker-compose"
 git clone https://github.com/thodges-gh/min-cl-docker-compose.git >>/dev/null 2>&1
