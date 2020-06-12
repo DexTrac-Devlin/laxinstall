@@ -38,23 +38,26 @@ docker-compose --version
 
 yumInstall (){
 echo " Updating yum"
-yum check-update
+sudo yum check-update
 
 echo " Installing dependencies"
-yum remove docker* >>/dev/null 2>&1
-yum install -y yum-utils device-mapper-persistent-data lvm2 >>/dev/null 2>&1
+sudo yum remove docker* >>/dev/null 2>&1
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2 >>/dev/null 2>&1
+
+echo "CentOS suck, and you know it."
+sudo dnf install -y https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm
 
 echo " Adding Docker repo"
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo >>/dev/null 2>&1
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo >>/dev/null 2>&1
 
 echo " Updating yum after changes"
-yum check-update >>/dev/null 2>&1
+sudo yum check-update >>/dev/null 2>&1
 
 echo " Installing latest release of Docker-CE"
-yum install docker-ce docker-ce-cli containerd.io >>/dev/null 2>&1
+sudo yum install -y containerd.io docker-ce docker-ce-cli >>/dev/null 2>&1
 
 echo " Starting Docker-CE service"
-systemctl start docker >>/dev/null 2>&1
+sudo systemctl start docker >>/dev/null 2>&1
 }
 
 
