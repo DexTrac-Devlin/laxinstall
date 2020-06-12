@@ -9,57 +9,83 @@ fi
 
 read -p "${b} Enter your non-root username:${n} " USERNAME
 
-echo "${b} Updating apt${n}"
+echo " Updating apt"
 apt-get -y update >>/dev/null 2>&1
 
-echo "${b} Installing dependencies${n}"
+echo " Installing dependencies"
 apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common >>/dev/null 2>&1
 
-echo "${b} Adding gpg key for Docker repo${n}"
+echo " Adding gpg key for Docker repo"
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - >>/dev/null 2>&1
 
-echo "${b} Adding Docker repo${n}"
+echo " Adding Docker repo"
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" >>/dev/null 2>&1
 
-echo "${b} Updating apt after changes${n}"
+echo " Updating apt after changes"
 apt-get -y update >>/dev/null 2>&1
 
-echo "${b} Installing latest release of Docker-CE"${n}
+echo " Installing latest release of Docker-CE"
 apt-get install docker-ce >>/dev/null 2>&1
 groupadd docker >>/dev/null 2>&1
-usermod -aG docker $USERNAME >>/dev/null 2>&1
+sudo usermod -aG docker $USERNAME >>/dev/null 2>&1
 
-echo "${b} Installing Docker-Compose${n}"
+echo " Installing Docker-Compose"
 sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose >>/dev/null 2>&1
 sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 
-git clone https://github.com/thodges-gh/min-cl-docker-compose.git
+echo " Cloning github.com/thodges-gh/min-cl-docker-compose"
+git clone https://github.com/thodges-gh/min-cl-docker-compose.git >>/dev/null 2>&1
 cd min-cl-docker-compose
 chmod +x start.sh stop.sh
 
-read -p "${b} Enter Ethereum endpoint URL/APIkey:${n} " ETHURL
-
 WORKINGDIR=$(pwd)
-sed -i "s|CHANGEME|$ETHURL|g" $WORKINGDIR/chainlink.env
 
-read -p "${b} Enter e-mail address to be used for GUI access:${n} "  EMAIL
-
+read -p " ${b}Enter e-mail address to be used for GUI access: ${n}"  EMAIL
 sed -i "s|test@example.com|$EMAIL|g" $WORKINGDIR/secrets/apicredentials
 
-read -s -p "${b} Enter password to be used for GUI access:${n} " GUIPASS
-
+read -s -p " ${b}Enter password to be used for GUI access: ${n}" GUIPASS
 sed -i "s|password|$GUIPASS|g" $WORKINGDIR/secrets/apicredentials
 
-echo "${b} Starting Postgres and Chainlink containers${n}"
+echo ""
+read -n 1 -p "Which network do you want to use? (${b}M${n})ainnet or (${b}R${n})opsten?" ANS0;
+case $ANS0 in
+  m|M )
+    echo ""
+    echo "You selected Mainnet."
+    FIEWSNETWORK=wss://cl-ropsten.fiews.io/v1/
+    sed -i "s|ETH_CHAIN_ID=3|ETH_CHAIN_ID=1|g" $WORKINGDIR/chainlink.env
+    sed -i "s|LINK_CONTRACT_ADDRESS=0x20fE562d797A42Dcb3399062AE9546cd06f63280|#LINK_CONTRACT_ADDRESS=0x20fE562d797A42Dcb3399062AE9546cd06f63280|g" $WORKINGDIR/chainlink.env;;
+  r|R )
+    echo ""
+    echo "You selected Ropsten."
+    FIEWSNETWORK=wss://cl-main.fiews.io/v1/;;
+  * )
+  echo "invalid";;
+esac
+
+echo ""
+read -n 1 -p "Are you using Fiews.io for your Etheruem Connection? (${b}Y${n})es or(${b}N${n})o" ANS1;
+case $ANS1 in
+  y|Y )
+    echo ""
+    read -p "${b}Please enter your Fiews.io API key.${n}" FIEWSAPI
+    sed -i "s|CHANGEME|$FIEWSNETWORK$FIEWSAPI|g" $WORKINGDIR/chainlink.env;;
+  n|N )
+    read -p "${b} Enter Ethereum endpoint URL/APIkey:${n}" ETHURL
+    sed -i "s|CHANGEME|$ETHURL|g" $WORKINGDIR/chainlink.env;;
+  * )
+  echo "invalid";;
+esac
+
+echo " Starting Postgres and Chainlink containers"
 docker-compose build
 docker-compose up -d
 
-echo "${b} Check running containers${n}"
+echo " Check running containers"
 docker container ps -a
-docker ps -q | xargs -n 1 docker inspect --format '{{ .Name }} {{range .NetworkSettings.Networks}} {{.IPAddress}}{{end}}' | sed 's#^/##';
 
-echo "${b}Your chainlink node should be available from this device at:${n}"
+echo " ${b}Your chainlink node should be available from this device at:${n}"
 echo "http://localhost:6688"
 
-echo "${b}Special thanks to https://github.com/thodges-gh.${n}"
+echo "${b}Special thanks to https://github.com/thodges-gh. ${n}"
