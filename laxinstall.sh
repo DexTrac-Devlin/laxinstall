@@ -95,7 +95,7 @@ docker-compose up -d
 docker container ps -a
 echo ""
 echo "7777777"
-echo"${b}Your chainlink node should be available from this device at:${n}"
-echo"${b}http://localhost:6688${n}"
-echo""
-echo"${b}Special thanks to https://github.com/thodges-gh. ${n}"
+echo "${b}Your chainlink node should be available from this device at:${n}"
+echo "${b}http://localhost:6688${n}"
+echo ""
+echo "${b}Special thanks to https://github.com/thodges-gh. ${n}"
