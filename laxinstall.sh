@@ -93,8 +93,9 @@ echo " Starting Postgres and Chainlink containers"
 docker-compose build
 docker-compose up -d
 docker container ps -a
-echo ""
-echo "7777777"
+echo "======="
+echo "${b}7777777${n}"
+echo "======="
 echo "${b}Your chainlink node should be available from this device at:${n}"
 echo "${b}http://localhost:6688${n}"
 echo ""
