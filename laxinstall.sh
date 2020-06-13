@@ -83,6 +83,7 @@ case $ANS1 in
     read -p "${b}Please enter your Fiews.io API key.${n}" FIEWSAPI
     sed -i "s|CHANGEME|$FIEWSNETWORK$FIEWSAPI|g" $WORKINGDIR/chainlink.env;;
   n|N )
+    echo ""
     read -p "${b} Enter Ethereum endpoint URL/APIkey:${n}" ETHURL
     sed -i "s|CHANGEME|$ETHURL|g" $WORKINGDIR/chainlink.env;;
   * )
