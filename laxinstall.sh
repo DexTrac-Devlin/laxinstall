@@ -57,7 +57,7 @@ chmod +x start.sh stop.sh
 WORKINGDIR=$(pwd)
 read -p " ${b}Enter e-mail address to be used for GUI access: ${n}"  EMAIL
 sed -i "s|test@example.com|$EMAIL|g" $WORKINGDIR/secrets/apicredentials
-read -s -p " ${b}Enter password to be used for GUI access: ${n}" GUIPASS
+read -s -p " ${b}Enter password to be used for GUI access (8-15 characters):${n}" GUIPASS
 sed -i "s|password|$GUIPASS|g" $WORKINGDIR/secrets/apicredentials
 echo ""
 read -n 1 -p "Which network do you want to use? (${b}M${n})ainnet or (${b}R${n})opsten?" ANS0;
