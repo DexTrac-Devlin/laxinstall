@@ -60,7 +60,7 @@ sed -i "s|test@example.com|$EMAIL|g" $WORKINGDIR/secrets/apicredentials
 read -s -p " ${b}Enter password to be used for GUI access (8-15 characters):${n}" GUIPASS
 sed -i "s|password|$GUIPASS|g" $WORKINGDIR/secrets/apicredentials
 echo ""
-read -n 1 -p "Which network do you want to use? ${b}M${n}ainnet or ${b}R${n}opsten?" ANS0;
+read -n 1 -p "Which network do you want to use? ${b}M${n}ainnet or ${b}R${n}opsten? " ANS0;
 case $ANS0 in
   m|M )
     echo ""
@@ -76,15 +76,15 @@ case $ANS0 in
   echo "invalid";;
 esac
 echo ""
-read -n 1 -p "Are you using Fiews.io for your Etheruem Connection? ${b}Y${n}es or ${b}N${n}o" ANS1;
+read -n 1 -p "Are you using Fiews.io for your Etheruem Connection? ${b}Y${n}es or ${b}N${n}o " ANS1;
 case $ANS1 in
   y|Y )
     echo ""
-    read -p "${b}Please enter your Fiews.io API key.${n}" FIEWSAPI
+    read -p "${b}Please enter your Fiews.io API key.${n} " FIEWSAPI
     sed -i "s|CHANGEME|$FIEWSNETWORK$FIEWSAPI|g" $WORKINGDIR/chainlink.env;;
   n|N )
     echo ""
-    read -p "${b} Enter Ethereum endpoint URL/APIkey:${n}" ETHURL
+    read -p "${b} Enter Ethereum endpoint URL/APIkey:${n} " ETHURL
     sed -i "s|CHANGEME|$ETHURL|g" $WORKINGDIR/chainlink.env;;
   * )
   echo "invalid";;
