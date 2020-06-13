@@ -24,7 +24,6 @@ yumInstall (){
 echo " Updating yum"
 echo " Installing dependencies & Docker-CE"
 sudo yum remove docker* >>/dev/null 2>&1
-
 sudo yum -y update >>/dev/null 2>&1
 sudo yum -y remove docker* >>/dev/null 2>&1
 sudo yum -y install yum-utils >>/dev/null 2>&1
