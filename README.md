@@ -2,7 +2,7 @@
 
 **This is intended for use on systems with apt or yum package managers**
 
-(there is a yum+apt branch that might work, but it has not been fully tested)
+(yum functionality hasn't really been tested too much, so please feel free to contrib)
 
 If you already have docker & docker-compose installed, I recommend you make use of https://github.com/thodges-gh/min-cl-docker-compose
 
