@@ -13,7 +13,7 @@ apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-prop
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - >>/dev/null 2>&1
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" >>/dev/null 2>&1
 apt-get -y update >>/dev/null 2>&1
-apt-get install docker-ce >>/dev/null 2>&1
+apt-get -y install docker-ce >>/dev/null 2>&1
 groupadd docker >>/dev/null 2>&1
 sudo usermod -aG docker $USERNAME >>/dev/null 2>&1
 sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose >>/dev/null 2>&1
