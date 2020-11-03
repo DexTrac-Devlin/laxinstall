@@ -88,6 +88,9 @@ case $ANS1 in
   * )
   echo "invalid";;
 esac
+echo ":latest tag no longer supported."
+read -p "${b} Please specify desired Chainlink Release.:${n} " $RELEASE
+sed -i 's/latest/$RELEASE/' Dockerfile
 echo " Starting Postgres and Chainlink containers"
 docker-compose build
 docker-compose up -d
