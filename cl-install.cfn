@@ -74,3 +74,6 @@ Resources:
             GUIPASS=${Guipass}
             ETHURL=${EthURL}
             RELEASE=${Release}
+            wget https://raw.githubusercontent.com/awilmoth/laxinstall-cloudformation/master/laxinstall.sh
+            chmod +x laxinstall.sh
+            sudo ./laxinstall.sh
