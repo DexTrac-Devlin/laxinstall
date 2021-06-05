@@ -54,19 +54,195 @@ Mappings:
     us-west-2: 
       AMD64: ami-0e312244e15c975b0
 
-Resources: 
-  ChainlinkNode:
-    Type: "AWS::EC2::Instance"
+Resources:
+  PrivateKey:
+    Type: Custom::RSAKey
+    Properties:
+      Name: /Chainlink/default/private-key
+      RefreshOnUpdate: false
+      ServiceToken: !GetAtt CFNSecretProvider.Arn
+
+  KeyPair:
+    Type: Custom::KeyPair
+    DependsOn: PrivateKey
+    Properties:
+      Name: ChainlinkKeyPair
+      PublicKeyMaterial: !GetAtt 'PrivateKey.PublicKey'
+      ServiceToken: !GetAtt CFNSecretProvider.Arn
+
+  CFNSecretProvider:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Sub 'binxio-public-${AWS::Region}'
+        S3Key: lambdas/cfn-secret-provider-0.13.2.zip
+      Handler: secrets.handler
+      MemorySize: 128
+      Role: !GetAtt 'CFNSecretProviderRole.Arn'
+      Runtime: python3.6
+      Timeout: 300
+
+  CFNSecretProviderLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${CFNSecretProvider}'
+      RetentionInDays: 30
+
+  CFNSecretProviderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+          Condition: {}
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+      - PolicyName: CFNCustomSecretProviderPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - iam:CreateAccessKey
+            - iam:UpdateAccessKey
+            - iam:DeleteAccessKey
+            - ssm:PutParameter
+            - ssm:GetParameter
+            - ssm:DeleteParameter
+            - ec2:ImportKeyPair
+            - ec2:DeleteKeyPair
+            Resource:
+            - '*'
+          - Effect: Allow
+            Action:
+            - kms:Encrypt
+            - kms:Decrypt
+            Resource:
+            - '*'
+
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+          CidrBlock: 172.31.0.0/16
+     
+  PublicSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: us-east-1a
+      CidrBlock: 172.31.1.0/24
+      MapPublicIpOnLaunch: true
+     
+  PrivateSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: us-east-1a
+      CidrBlock: 172.31.3.0/24
+      MapPublicIpOnLaunch: false
+           
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join [_, [!Ref 'AWS::StackName']]
+        - Key: Network
+          Value: Public
+      
+  GatewayToInternet:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+      
+  PublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Network
+          Value: Public
+      
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: GatewayToInternet
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+     
+  PublicSubnet1RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+     
+  NatGateway:
+    Type: "AWS::EC2::NatGateway"
+    DependsOn: NatPublicIP
     Properties: 
+      AllocationId: !GetAtt NatPublicIP.AllocationId
+      SubnetId: !Ref PublicSubnet1
+     
+  NatPublicIP:
+    Type: "AWS::EC2::EIP"
+    DependsOn: VPC
+    Properties:
+      Domain: vpc
+     
+  PrivateRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Network
+          Value: Private
+      
+  PrivateRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+     
+  PrivateSubnet1RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  ChainlinkHost:
+    Type: AWS::EC2::Instance
+    Properties:
       ImageId: !FindInMap
         - RegionMap
         - !Ref 'AWS::Region'
-        - AMD64
-      InstanceType: t3.small
+        - AMD64      
+      KeyName: ChainlinkKeyPair
+      InstanceType: 't3.small'
+      SourceDestCheck: false
+      SubnetId: !Ref PrivateSubnet1
+      SecurityGroupIds:
+        - !Ref ChainlinkHostSecurityGroup
+      IamInstanceProfile: !Ref ChainlinkInstanceProfile
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvdcz
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 64
+            DeleteOnTermination: true
+            Encrypted: true
       UserData:
         Fn::Base64:
           !Sub |
             #!/bin/bash
+            snap install amazon-ssm-agent --classic
             ANS0=${Ans0}
             ANS1='n'
             USERNAME='ubuntu'
@@ -77,3 +253,47 @@ Resources:
             wget https://raw.githubusercontent.com/awilmoth/laxinstall-cloudformation/master/laxinstall.sh
             chmod +x laxinstall.sh
             sudo ./laxinstall.sh
+
+  ChainlinkInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref ChainlinkRole
+
+  ChainlinkRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM'
+        - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser'
+      Policies:
+        - PolicyName: chainlink
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/Chainlink/default/*'
+
+  ChainlinkHostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Groupcontent: 'Security group for the Chainlink host'
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'
