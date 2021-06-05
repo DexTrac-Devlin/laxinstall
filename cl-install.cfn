@@ -237,6 +237,10 @@ Resources:
             VolumeSize: 64
             DeleteOnTermination: true
             Encrypted: true
+      Tags:
+        -
+          Key: Name
+          Value: ChainlinkNode
       UserData:
         Fn::Base64:
           !Sub |
@@ -319,6 +323,10 @@ Resources:
             VolumeSize: 10
             DeleteOnTermination: true
             Encrypted: true
+      Tags:
+        -
+          Key: Name
+          Value: Bastion
       UserData:
         Fn::Base64:
           !Sub |
