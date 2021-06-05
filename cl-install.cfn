@@ -1,0 +1,57 @@
+Parameters:
+  Ans0:
+    Description: Cockpit platform Select.
+    Type: String
+    AllowedValues: [ropsten, mainnet]
+
+Mappings: 
+  RegionMap:
+    eu-north-1: 
+      HVM64: ami-0fa158c56ef9173a7 
+    ap-south-1: 
+      HVM64: ami-087f0cfa0f2c4aab4
+    eu-west-3: 
+      HVM64: ami-0276be082fdf4360f
+    eu-west-2: 
+      HVM64: ami-0bf29ab8053c7702b
+    eu-west-1: 
+      HVM64: ami-0619b7d87e1f22353
+    ap-northeast-3: 
+      HVM64: ami-0ac7123fc9d438b13
+    ap-northeast-2: 
+      HVM64: ami-066a2934f24b7924f
+    ap-northeast-1: 
+      HVM64: ami-0dd60c653a4d776b3
+    sa-east-1: 
+      HVM64: ami-0dbf93ef4b13d39d8
+    ca-central-1: 
+      HVM64: ami-0d033b42a0fa2723b
+    ap-southeast-1: 
+      HVM64: ami-015110cb75ec697d1
+    ap-southeast-2: 
+      HVM64: ami-00b3261b10af07429
+    eu-central-1: 
+      HVM64: ami-0f20eb87a88c2c776
+    us-east-1: 
+      HVM64: ami-0d3b689c95e67d77f
+    us-east-2: 
+      HVM64: ami-0b35b356be6058cf7
+    us-west-1: 
+      HVM64: ami-0aa376f3fc0ec5b83
+    us-west-2: 
+      HVM64: ami-0f708a6679caeb28d
+
+Resources: 
+  ChainlinkNode:
+    Type: "AWS::EC2::Instance"
+    Properties: 
+      ImageId: !FindInMap
+        - RegionMap
+        - !Ref 'AWS::Region'
+        - HVM64
+      InstanceType: t3.small
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            #EMAIL=${Email}
