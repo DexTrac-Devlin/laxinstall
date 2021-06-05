@@ -226,7 +226,6 @@ Resources:
         - AMD64      
       KeyName: ChainlinkKeyPair
       InstanceType: 't3.small'
-      SourceDestCheck: false
       SubnetId: !Ref PrivateSubnet1
       SecurityGroupIds:
         - !Ref ChainlinkHostSecurityGroup
@@ -243,6 +242,7 @@ Resources:
           !Sub |
             #!/bin/bash
             snap install amazon-ssm-agent --classic
+            apt update && apt upgrade -y
             ANS0=${Ans0}
             ANS1='n'
             USERNAME='ubuntu'
@@ -289,7 +289,81 @@ Resources:
   ChainlinkHostSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      Groupcontent: 'Security group for the Chainlink host'
+      GroupDescription: Chainlink
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'
+
+  BastionHost:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap
+        - RegionMap
+        - !Ref 'AWS::Region'
+        - AMD64      
+      KeyName: ChainlinkKeyPair
+      InstanceType: 't3.micro'
+      SourceDestCheck: false
+      SubnetId: !Ref PublicSubnet1
+      SecurityGroupIds:
+        - !Ref BastionHostSecurityGroup
+      IamInstanceProfile: !Ref BastionInstanceProfile
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvdcz
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 10
+            DeleteOnTermination: true
+            Encrypted: true
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash
+            snap install amazon-ssm-agent --classic
+            snap install aws-cli
+            apt update && apt upgrade -y
+            apt install jq
+
+  BastionInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref BastionRole
+
+  BastionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM'
+        - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser'
+      Policies:
+        - PolicyName: bastion
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/bastion/default/*'
+
+  BastionHostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Bastion
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: '-1'
