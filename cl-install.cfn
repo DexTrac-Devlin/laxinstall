@@ -20,39 +20,39 @@ Parameters:
 Mappings: 
   RegionMap:
     eu-north-1: 
-      HVM64: ami-0f7828a9c19ff4a9e
+      AMD64: ami-0f7828a9c19ff4a9e
     ap-south-1: 
-      HVM64: ami-0c1566e39d136b269
+      AMD64: ami-0c1566e39d136b269
     eu-west-3: 
-      HVM64: ami-08d3d8790db280475
+      AMD64: ami-08d3d8790db280475
     eu-west-2: 
-      HVM64: ami-0e312244e15c975b0
+      AMD64: ami-0e312244e15c975b0
     eu-west-1: 
-      HVM64: ami-06c5b2809791cf59c
+      AMD64: ami-06c5b2809791cf59c
     ap-northeast-3: 
-      HVM64: ami-02a8547248b1cc18b
+      AMD64: ami-02a8547248b1cc18b
     ap-northeast-2: 
-      HVM64: ami-09378a0a8e36fabc7
+      AMD64: ami-09378a0a8e36fabc7
     ap-northeast-1: 
-      HVM64: ami-03f396733f38d658b
+      AMD64: ami-03f396733f38d658b
     sa-east-1: 
-      HVM64: ami-045a803b4a81b4175
+      AMD64: ami-045a803b4a81b4175
     ca-central-1: 
-      HVM64: ami-0fc1738fbeaf067cf
+      AMD64: ami-0fc1738fbeaf067cf
     ap-southeast-1: 
-      HVM64: ami-0d83255a5b17bc4d7
+      AMD64: ami-0d83255a5b17bc4d7
     ap-southeast-2: 
-      HVM64: ami-0ad3265c866331223
+      AMD64: ami-0ad3265c866331223
     eu-central-1: 
-      HVM64: ami-078ca7285317cfe91
+      AMD64: ami-078ca7285317cfe91
     us-east-1: 
-      HVM64: ami-01de8ddb33de7a3d3
+      AMD64: ami-01de8ddb33de7a3d3
     us-east-2: 
-      HVM64: ami-051d99278ba9fdc66
+      AMD64: ami-051d99278ba9fdc66
     us-west-1: 
-      HVM64: ami-06c5b2809791cf59c
+      AMD64: ami-06c5b2809791cf59c
     us-west-2: 
-      HVM64: ami-0e312244e15c975b0
+      AMD64: ami-0e312244e15c975b0
 
 Resources: 
   ChainlinkNode:
@@ -61,7 +61,7 @@ Resources:
       ImageId: !FindInMap
         - RegionMap
         - !Ref 'AWS::Region'
-        - HVM64
+        - AMD64
       InstanceType: t3.small
       UserData:
         Fn::Base64:
