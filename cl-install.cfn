@@ -1,45 +1,58 @@
 Parameters:
   Ans0:
-    Description: Cockpit platform Select.
+    Description: Select Network. M for Mainnet, R for Ropsten
     Type: String
-    AllowedValues: [ropsten, mainnet]
+    AllowedValues: [r, m]
+  Guipass:
+    Description: GUI password
+    Type: String
+    NoEcho: true
+  Email:
+    Description: GUI email for login
+    Type: String
+  EthURL:
+    Description: URL for ethereum node
+    Type: String
+  Release:
+    Description: Chainlink Release
+    Type: String
 
 Mappings: 
   RegionMap:
     eu-north-1: 
-      HVM64: ami-0fa158c56ef9173a7 
+      HVM64: ami-0f7828a9c19ff4a9e
     ap-south-1: 
-      HVM64: ami-087f0cfa0f2c4aab4
+      HVM64: ami-0c1566e39d136b269
     eu-west-3: 
-      HVM64: ami-0276be082fdf4360f
+      HVM64: ami-08d3d8790db280475
     eu-west-2: 
-      HVM64: ami-0bf29ab8053c7702b
+      HVM64: ami-0e312244e15c975b0
     eu-west-1: 
-      HVM64: ami-0619b7d87e1f22353
+      HVM64: ami-06c5b2809791cf59c
     ap-northeast-3: 
-      HVM64: ami-0ac7123fc9d438b13
+      HVM64: ami-02a8547248b1cc18b
     ap-northeast-2: 
-      HVM64: ami-066a2934f24b7924f
+      HVM64: ami-09378a0a8e36fabc7
     ap-northeast-1: 
-      HVM64: ami-0dd60c653a4d776b3
+      HVM64: ami-03f396733f38d658b
     sa-east-1: 
-      HVM64: ami-0dbf93ef4b13d39d8
+      HVM64: ami-045a803b4a81b4175
     ca-central-1: 
-      HVM64: ami-0d033b42a0fa2723b
+      HVM64: ami-0fc1738fbeaf067cf
     ap-southeast-1: 
-      HVM64: ami-015110cb75ec697d1
+      HVM64: ami-0d83255a5b17bc4d7
     ap-southeast-2: 
-      HVM64: ami-00b3261b10af07429
+      HVM64: ami-0ad3265c866331223
     eu-central-1: 
-      HVM64: ami-0f20eb87a88c2c776
+      HVM64: ami-078ca7285317cfe91
     us-east-1: 
-      HVM64: ami-0d3b689c95e67d77f
+      HVM64: ami-01de8ddb33de7a3d3
     us-east-2: 
-      HVM64: ami-0b35b356be6058cf7
+      HVM64: ami-051d99278ba9fdc66
     us-west-1: 
-      HVM64: ami-0aa376f3fc0ec5b83
+      HVM64: ami-06c5b2809791cf59c
     us-west-2: 
-      HVM64: ami-0f708a6679caeb28d
+      HVM64: ami-0e312244e15c975b0
 
 Resources: 
   ChainlinkNode:
@@ -54,4 +67,10 @@ Resources:
         Fn::Base64:
           !Sub |
             #!/bin/bash
-            #EMAIL=${Email}
+            ANS0=${Ans0}
+            ANS1='n'
+            USERNAME='ubuntu'
+            EMAIL=${Email}
+            GUIPASS=${Guipass}
+            ETHURL=${EthURL}
+            RELEASE=${Release}
