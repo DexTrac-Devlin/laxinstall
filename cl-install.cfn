@@ -279,7 +279,6 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM'
-        - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser'
       Policies:
         - PolicyName: chainlink
           PolicyDocument:
@@ -336,6 +335,7 @@ Resources:
             snap install aws-cli --classic
             snap install jq --classic
             apt update && apt upgrade -y
+            aws ssm get-parameter --name /Chainlink/default/private-key --with-decryption | jq -r '.Parameter.Value' > /home/ubuntu/ChainlinkKeyPair.pem && chmod 400 /home/ubuntu/ChainlinkKeyPair.pem
             
   BastionInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -358,7 +358,6 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM'
-        - 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser'
       Policies:
         - PolicyName: bastion
           PolicyDocument:
@@ -367,7 +366,7 @@ Resources:
                 Action:
                   - ssm:GetParameter
                 Resource:
-                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/bastion/default/*'
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/Chainlink/default/*'
 
   BastionHostSecurityGroup:
     Type: AWS::EC2::SecurityGroup
