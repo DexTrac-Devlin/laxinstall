@@ -297,7 +297,7 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: '-1'
-          CidrIp: '0.0.0.0/0'
+          CidrIp: '172.31.1.0/24'
       SecurityGroupEgress:
         - IpProtocol: '-1'
           CidrIp: '0.0.0.0/0'
@@ -379,3 +379,12 @@ Resources:
       SecurityGroupEgress:
         - IpProtocol: '-1'
           CidrIp: '0.0.0.0/0'
+
+  IPAddress:
+    Type: AWS::EC2::EIP
+
+  IPAssoc:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref 'BastionHost'
+      EIP: !Ref 'IPAddress'
