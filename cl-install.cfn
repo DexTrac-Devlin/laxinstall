@@ -331,10 +331,12 @@ Resources:
         Fn::Base64:
           !Sub |
             #!/bin/bash
+            export AWS_DEFAULT_REGION=${AWS::Region}
             snap install amazon-ssm-agent --classic
-            snap install aws-cli
+            snap install aws-cli --classic
+            snap install jq --classic
             apt update && apt upgrade -y
-            apt install jq
+            
 
   BastionInstanceProfile:
     Type: AWS::IAM::InstanceProfile
