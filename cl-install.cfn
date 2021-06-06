@@ -4,14 +4,14 @@ Parameters:
     Type: String
     AllowedValues: [r, m]
   Guipass:
-    Description: GUI password
+    Description: Chainlink Node GUI - Password
     Type: String
     NoEcho: true
   Email:
-    Description: GUI email for login
+    Description: Chainlink Node GUI - Email for Login
     Type: String
   EthURL:
-    Description: URL for ethereum node
+    Description: URL for Ethereum Node
     Type: String
   Release:
     Description: Chainlink Release
@@ -337,7 +337,6 @@ Resources:
             snap install jq --classic
             apt update && apt upgrade -y
             
-
   BastionInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
